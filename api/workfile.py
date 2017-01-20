@@ -16,6 +16,19 @@ class Workfile(AlpineObject):
                                        "alpinedatalabs/api/{0}/json".format(self._alpine_api_version))
         self.logger.debug("alpine_base_url is: {0}".format(self.alpine_base_url))
 
+    def find_operator(self, name, operator_list):
+        """
+        Helper method to parse a downloaded workflow result for a single operator
+
+        :param name: String that exactly matches the operator name in the workflow
+        :param operator_list: A list of operators and associated results. Get from download_workflow_results(...)['outputs']
+        :return: The results of a single operator
+        """
+        for operator in operator_list:
+            if operator['out_title'] == name:
+                return operator
+        return []
+
     def get_workfiles_list(self, workspace_id, per_page=100):
         """
 
@@ -44,7 +57,7 @@ class Workfile(AlpineObject):
             else:
                 workfile_list = workfile_list_response['response']
             if page_total == page_current:
-                break;
+                break
         return workfile_list
 
     def get_workfile_info(self, workfile_name, workspace_id):
@@ -130,18 +143,18 @@ class Workfile(AlpineObject):
 
         :param workflow_id:
         :param process_id:
-        :return:
+        :return: JSON object of workflow results.
         """
         url = "{0}/workflows/{1}/results/{2}".format(self.alpine_base_url, workflow_id, process_id)
         response = self.session.get(url)
         self.logger.debug(response.content)
         if response.status_code == 200:
             if response.content == "\"\"":
-                raise Exception("results of flow {0} for session {1} are empty, "
+                raise Exception("Results of flow {0} for process {1} are empty, "
                                 "please check whether there are results not cleared"
                                 .format(workflow_id, process_id))
             else:
-                return response
+                return json.loads(response.json())
         else:
             raise Exception("Download Workflow Results failed with status {0}: {1}"
                             .format(response.status_code, response.reason))
@@ -194,22 +207,6 @@ class Workfile(AlpineObject):
                 raise RunFlowFailureException("The workflow with process id: {0} failed...".format(process_id))
             workflow_status = self.query_workflow_status(process_id)
         return workflow_status
-
-    def download_workflow_results(self, workflow_id, process_id):
-        """
-
-        :param workflow_id:
-        :param process_id:
-        :return:
-        """
-
-        result_url = "{0}/workflows/{1}/results/{2}".format(self.alpine_base_url, workflow_id, process_id)
-
-
-        #result_url = self.alpine_base_url + "/alpinedatalabs/api/v1/json/workflows/" \
-        #             + str(workflow_id) + "/results/" + str(process_id)
-        response = self.session.get(result_url)
-        return response
 
     def delete_workfile(self, workfile_name, workspace_id):
         """

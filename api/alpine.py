@@ -18,9 +18,7 @@ from api.touchpoint import TouchPoint
 class Alpine(AlpineObject):
     """
     An Entry to do operation with Alpine APIs.
-
     This class is the main entry for alpine api.
-
     """
     #
     # Entry for User/Datasource/Workspace/Workfile/Job/Touchpoint sessions
@@ -41,19 +39,21 @@ class Alpine(AlpineObject):
 
     def __init__(self, host=None, port=None, username=None, password=None,
                  is_secure=False, validate_certs=False, ca_certs=None,
-                 token=None):
+                 token=None, logging_level='WARN'):
         """
-        Sets internal values for Alpine API session and Performs login to check that parameters are set correctly
+        Sets internal values for Alpine API session and performs login to check that parameters are set correctly
         while username and password are not null
 
         :param host: hostname or ip address of the Alpine server
-        :param port: port number for Alpine,
+        :param port: port number for Alpine
         :param username: username to login with
         :param password: password to login with
         :param is_secure:
         :param validate_certs:
         :param ca_certs:
-        :param token:
+        :param token: Alpine API authentication token
+        :param logging_level: https://docs.python.org/2/howto/logging.html#logging-levels
+        :return: None
         """
 
         super(Alpine, self).__init__(token=token)
@@ -87,9 +87,8 @@ class Alpine(AlpineObject):
         Logs into Alpine with provided username and password
 
         :param username: username to login with
-        :param password: password to log in with
-        :return: returns a token ID which should be used for other actions
-
+        :param password: password to login with
+        :return: returns a Alpine API authentication token to be used for other actions
         """
         # build the url string and body payload
         url= "{0}/sessions?session_id=NULL".format(self.base_url)
@@ -128,10 +127,9 @@ class Alpine(AlpineObject):
 
     def logout(self):
         """
-        Logout the session
+        Logout of the session
 
         :return: response of the logout session
-
         """
         # Is there a way to do this without explicitly including the token in the url?
         url = "{0}/sessions?session_id={1}".format(self.base_url, self.token)
@@ -143,38 +141,46 @@ class Alpine(AlpineObject):
         self.workfile = None
         self.user = None
         self.datasource = None
+
+        # parse status codes here:
+
+        status = logout_response.status_code
+
         return logout_response
 
     def get_login_status(self):
         """
         Get the current login status from Alpine API
 
-        :return: json format of the current login status
-
+        :return: Current login status in JSON format
         """
+        #TODO: Needs to fail gracefully.
         url = "{0}/sessions".format(self.base_url)
         self.logger.debug("Checking to see if the user is still logged in....")
         response = self.session.get(url)
         self.logger.debug("Received response code {0} with reason {1}".format(response.status_code, response.reason))
-        return response.json()
+
+        try:
+            return response.json()
+        except:
+            print("Not logged in")
+            return {}
 
     def get_alpine_version(self):
         """
         Returns the alpine version as a sting
 
-        :return: version as a string
-
+        :return: Alpine version as a string
         """
         url = "{0}/VERSION".format(self.base_url)
         response = self.session.get(url)
-        return response.content
+        return response.content.strip()
 
     def get_license_info(self):
         """
         Get the License information of Alpine
 
-        :return: json format license infomation
-
+        :return: Summary of Alpine license information - expiration, user limits, add-ons
         """
         url = self.base_url + "/license"
         response = self.session.get(url)
