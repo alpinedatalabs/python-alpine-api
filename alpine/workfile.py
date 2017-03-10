@@ -501,4 +501,7 @@ class Workfile(AlpineObject):
                 if workflow_status == "FAILED":
                     raise RunFlowFailureException("The workflow with process ID: {0} failed.".format(process_id))
                 workflow_status = self.query_status(process_id)
+
+            if verbose:
+                print("")
             return workflow_status

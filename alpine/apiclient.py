@@ -20,7 +20,7 @@ class APIClient(AlpineObject):
     Example::
 
         >>> import alpine as AlpineAPI
-        >>> session = alpine.APIClient(host, port, username, password)
+        >>> session = AlpineAPI.APIClient(host, port, username, password)
 
     """
 

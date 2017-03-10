@@ -14,7 +14,7 @@
 doc/_build/
 
 #
-.ipynb_checkpoints/
+*.ipynb_checkpoints/
 
 # Setuptools distribution folder.
 /dist/

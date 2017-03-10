@@ -1,5 +1,5 @@
 Data Sources
-***********
+************
 
 .. automodule:: alpine.datasource
 
