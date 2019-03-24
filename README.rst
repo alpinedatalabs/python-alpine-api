@@ -16,8 +16,9 @@ Python Package Index:
    https://pypi.python.org/pypi/alpine
 
 Setup:
+   Execute command::
 
-   pip install alpine
+      pip install alpine
 
 Requirements:
    Using this package requires access to a TIBCO Spotfire® Data Science instance. For more information, see the TIBCO Spotfire® Data Science homepage:
