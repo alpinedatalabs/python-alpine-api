@@ -16,8 +16,9 @@ Python Package Index:
    https://pypi.python.org/pypi/alpine
 
 Setup:
+   Execute command::
 
-   pip install alpine
+      pip install alpine
 
 Requirements:
    Using this package requires access to a TIBCO Team Studio instance. For more information, see the TIBCO Team Studio homepage:
